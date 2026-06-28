@@ -20,7 +20,7 @@ Circom 2.1 | snarkjs | Soroban SDK | React + Vite | Stellar Testnet
 ## Quick Start
 
 ### Prerequisites
-- Rust, Node.js, Circom, snarkjs, Soroban CLI
+- Rust >= 1.84, Node.js >= 20, Circom, snarkjs, Soroban CLI
 
 ### 1. Setup
 ```bash
@@ -54,7 +54,7 @@ npm run demo:proof
 
 ## Demo
 
-[Link to 2-minute demo video]
+See [DEMO_SCRIPT.md](./DEMO_SCRIPT.md) for step-by-step demo instructions.
 
 ## ZK Explanation
 
@@ -62,8 +62,13 @@ See [ZK_EXPLANATION.md](./ZK_EXPLANATION.md).
 
 ## Contract Addresses (Testnet)
 
-- Verifier: `TBD`
-- Payroll: `TBD`
+- Verifier: `CCXIGG3XWVN44OZAXOIG4AWGDFQX46TPYFNNLTMN7ONBRH2VXS6Y52UA`
+- Payroll: `CBC3PSZJP5XH72P4AXI3FNSPYTDBZ3DQBSS7OV5FMTL2EMSDDVXKKAFN`
+
+## Successful Claim Transaction
+
+- **Tx Hash:** `56ca0513c213ca17a4082940acf7853d9bde89330542383aef523e8124f1d2a4`
+- **Explorer:** https://stellar.expert/explorer/testnet/tx/56ca0513c213ca17a4082940acf7853d9bde89330542383aef523e8124f1d2a4
 
 ## License
 

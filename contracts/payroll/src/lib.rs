@@ -1,7 +1,8 @@
 #![no_std]
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, Address, Bytes, BytesN, Env, IntoVal,
-    Map, Symbol, Vec,
+    contract, contracterror, contractimpl, contracttype,
+    crypto::bn254::{Bn254Fr, Bn254G1Affine, Bn254G2Affine},
+    Address, BytesN, Env, IntoVal, Map, Symbol, Vec,
 };
 
 #[contracttype]
@@ -10,6 +11,14 @@ pub struct PayrollState {
     pub employer: Address,
     pub verifier: Address,
     pub root: Option<BytesN<32>>,
+}
+
+#[derive(Clone)]
+#[contracttype]
+pub struct Groth16Proof {
+    pub a: Bn254G1Affine,
+    pub b: Bn254G2Affine,
+    pub c: Bn254G1Affine,
 }
 
 #[contracterror]
@@ -76,7 +85,9 @@ impl Payroll {
         env: Env,
         amount: i128,
         nullifier: BytesN<32>,
-        proof: Bytes,
+        pi_a: BytesN<64>,
+        pi_b: BytesN<128>,
+        pi_c: BytesN<64>,
     ) -> Result<(), Error> {
         let state: PayrollState = env
             .storage()
@@ -98,22 +109,33 @@ impl Payroll {
             return Err(Error::NullifierUsed);
         }
 
-        // Build public_inputs = [root | nullifier | amount]
-        let mut public_inputs = Bytes::new(&env);
-        public_inputs.append(&Bytes::from(root.clone()));
-        public_inputs.append(&Bytes::from(nullifier.clone()));
+        // Construct proof
+        let proof = Groth16Proof {
+            a: Bn254G1Affine::from_array(&env, &pi_a.to_array()),
+            b: Bn254G2Affine::from_array(&env, &pi_b.to_array()),
+            c: Bn254G1Affine::from_array(&env, &pi_c.to_array()),
+        };
 
-        // amount as 32-byte big-endian
+        // Construct public signals [amount, root, nullifier]
+        let mut pub_signals = Vec::new(&env);
+
+        // amount as Bn254Fr (32-byte big-endian)
         let mut amount_bytes = [0u8; 32];
-        let amount_u256 = amount as u64; // Simplified: assume amount fits in u64 for demo
-        amount_bytes[24..32].copy_from_slice(&amount_u256.to_be_bytes());
-        public_inputs.extend_from_array(&amount_bytes);
+        let amount_u64 = amount as u64;
+        amount_bytes[24..32].copy_from_slice(&amount_u64.to_be_bytes());
+        pub_signals.push_back(Bn254Fr::from_bytes(BytesN::from_array(&env, &amount_bytes)));
+
+        // root as Bn254Fr
+        pub_signals.push_back(Bn254Fr::from_bytes(root.clone()));
+
+        // nullifier as Bn254Fr
+        pub_signals.push_back(Bn254Fr::from_bytes(nullifier.clone()));
 
         // Call verifier contract
         let verify_result = env.invoke_contract::<bool>(
             &state.verifier,
-            &Symbol::new(&env, "verify"),
-            (proof, public_inputs, nullifier.clone()).into_val(&env),
+            &Symbol::new(&env, "verify_proof"),
+            (proof, pub_signals).into_val(&env),
         );
 
         if !verify_result {
@@ -129,9 +151,6 @@ impl Payroll {
             (Symbol::new(&env, "claim"), env.current_contract_address()),
             (nullifier, amount),
         );
-
-        // TODO: Add XLM token transfer here if time permits
-        // For MVP, we record the claim event as proof of successful verification.
 
         Ok(())
     }

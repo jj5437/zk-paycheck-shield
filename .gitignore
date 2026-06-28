@@ -1,0 +1,15 @@
+node_modules/
+dist/
+target/
+*.r1cs
+*.wasm
+*.sym
+*.ptau
+*.zkey
+*.vkey.json
+verification_key.json
+.env
+*.log
+.DS_Store
+contracts/*/verifier_contract_id.txt
+contracts/*/payroll_contract_id.txt

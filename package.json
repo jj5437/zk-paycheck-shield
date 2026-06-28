@@ -1,0 +1,14 @@
+{
+  "name": "zk-paycheck-shield",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "setup": "bash scripts/01-setup-tools.sh",
+    "build:circuit": "bash scripts/02-build-circuit.sh",
+    "gen:verifier": "bash scripts/03-gen-verifier.sh",
+    "deploy": "bash scripts/04-deploy.sh",
+    "demo:proof": "node scripts/generate-proof.js",
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build"
+  }
+}

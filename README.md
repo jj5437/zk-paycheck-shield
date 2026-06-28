@@ -52,13 +52,13 @@ cd frontend && npm install && npm run dev
 npm run demo:proof
 ```
 
-## Demo
+## Repository
 
-See [DEMO_SCRIPT.md](./DEMO_SCRIPT.md) for step-by-step demo instructions.
+https://github.com/jj5437/zk-paycheck-shield
 
-## ZK Explanation
+## Demo Video
 
-See [ZK_EXPLANATION.md](./ZK_EXPLANATION.md).
+[TBD - 2-3 minute screen recording]
 
 ## Contract Addresses (Testnet)
 

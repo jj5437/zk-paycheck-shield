@@ -15,3 +15,4 @@ contracts/*/verifier_contract_id.txt
 contracts/*/payroll_contract_id.txt
 *.mp4
 *.webm
+.wrangler/

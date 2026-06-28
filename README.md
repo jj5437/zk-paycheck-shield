@@ -58,7 +58,7 @@ https://github.com/jj5437/zk-paycheck-shield
 
 ## Demo Video
 
-*Uploading to Cloudflare R2 — link will be inserted here.*
+https://assets.jijingai.cc/zk-paycheck-shield-demo-v2-subtitled.mp4 — 2:10 English narrated demo with burned-in captions.
 
 ## Contract Addresses (Testnet)
 

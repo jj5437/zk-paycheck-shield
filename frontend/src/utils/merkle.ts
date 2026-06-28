@@ -26,7 +26,7 @@ export async function computeLeaf(name: string, amount: number): Promise<Uint8Ar
   const view = new DataView(amountBytes.buffer);
   view.setBigUint64(24, BigInt(amount), false); // big-endian
   const leaf = p([nameHash, amountBytes]);
-  return p.F.unwrap(leaf);
+  return new Uint8Array(leaf);
 }
 
 export async function buildMerkleTree(leaves: Uint8Array[]): Promise<{
@@ -44,12 +44,12 @@ export async function buildMerkleTree(leaves: Uint8Array[]): Promise<{
   const level1: Uint8Array[] = [];
   for (let i = 0; i < leaves.length; i += 2) {
     const h = p([leaves[i], leaves[i + 1]]);
-    level1.push(p.F.unwrap(h));
+    level1.push(new Uint8Array(h));
   }
 
   // Root
   const rootHash = p([level1[0], level1[1]]);
-  const root = p.F.unwrap(rootHash);
+  const root = new Uint8Array(rootHash);
 
   // Compute paths for each leaf
   const paths = leaves.map((_leaf, idx) => {

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import {
   DownloadSimple,
   FileCsv,
-  FileJs,
+  FileText,
   CheckCircle,
   Circle,
   Eye,
@@ -311,7 +311,7 @@ export default function ComplianceDashboard({
               transition: 'all 0.2s ease',
             }}
           >
-            <FileJs size={14} />
+            <FileText size={14} />
             JSON
           </button>
           <button

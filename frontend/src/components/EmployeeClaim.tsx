@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Lock,
+  Lightning,
+  PaperPlaneRight,
+  CheckCircle,
+  WarningCircle,
+  Info,
+} from '@phosphor-icons/react';
 import { hashName, bytesToHex } from '../utils/merkle';
-
-// snarkjs dynamic import for browser
-declare const snarkjs: any;
 
 interface EmployeeClaimProps {
   merkleRoot: string | null;
@@ -10,117 +16,49 @@ interface EmployeeClaimProps {
   employees: { name: string; amount: number }[];
 }
 
-const panelStyle: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.06)',
-  backdropFilter: 'blur(12px)',
-  WebkitBackdropFilter: 'blur(12px)',
-  border: '1px solid rgba(255,255,255,0.10)',
-  borderRadius: '16px',
-  padding: '28px',
-  color: '#f8fafc',
-};
+type StatusType = 'info' | 'success' | 'error';
 
-const titleStyle: React.CSSProperties = {
-  fontSize: '20px',
-  fontWeight: 600,
-  marginBottom: '20px',
-  color: '#f8fafc',
-};
+interface Status {
+  message: string;
+  type: StatusType;
+}
 
-const labelStyle: React.CSSProperties = {
-  display: 'block',
-  fontSize: '12px',
-  color: '#94a3b8',
-  marginBottom: '6px',
-  textTransform: 'uppercase',
-  letterSpacing: '0.05em',
-};
-
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '12px 14px',
-  background: 'rgba(255,255,255,0.04)',
-  border: '1px solid rgba(255,255,255,0.10)',
-  borderRadius: '10px',
-  color: '#f8fafc',
-  fontSize: '14px',
-  marginBottom: '16px',
-  outline: 'none',
-  fontFamily: "'Geist Mono', 'Fira Code', monospace",
-};
-
-const buttonStyle: React.CSSProperties = {
-  background: '#34d399',
-  color: '#064e3b',
-  border: 'none',
-  borderRadius: '10px',
-  padding: '12px 24px',
-  fontSize: '14px',
-  fontWeight: 600,
-  cursor: 'pointer',
-  transition: 'all 0.2s ease',
-  marginRight: '10px',
-  marginBottom: '10px',
-};
-
-const secondaryButtonStyle: React.CSSProperties = {
-  ...buttonStyle,
-  background: 'rgba(255,255,255,0.08)',
-  color: '#f8fafc',
-};
-
-const textareaStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '12px 14px',
-  background: 'rgba(255,255,255,0.04)',
-  border: '1px solid rgba(255,255,255,0.10)',
-  borderRadius: '10px',
-  color: '#f8fafc',
-  fontSize: '13px',
-  fontFamily: "'Geist Mono', 'Fira Code', monospace",
-  outline: 'none',
-  resize: 'vertical',
-};
-
-const statusBoxStyle = (success?: boolean): React.CSSProperties => ({
-  marginTop: '16px',
-  padding: '14px',
-  background: success ? 'rgba(52, 211, 153, 0.08)' : 'rgba(255,255,255,0.04)',
-  border: `1px solid ${success ? 'rgba(52, 211, 153, 0.20)' : 'rgba(255,255,255,0.10)'}`,
-  borderRadius: '10px',
-  fontSize: '13px',
-  color: success ? '#34d399' : '#94a3b8',
-});
-
-export default function EmployeeClaim({ merkleRoot, paths, employees }: EmployeeClaimProps) {
+export default function EmployeeClaim({
+  merkleRoot,
+  paths,
+  employees,
+}: EmployeeClaimProps) {
   const [name, setName] = useState('Carol');
   const [amount, setAmount] = useState(2000);
   const [proofJson, setProofJson] = useState('');
-  const [status, setStatus] = useState('');
-  const [statusSuccess, setStatusSuccess] = useState(false);
+  const [status, setStatus] = useState<Status | null>(null);
   const [generating, setGenerating] = useState(false);
 
   const generateProofInBrowser = async () => {
     if (!merkleRoot) {
-      setStatus('Wait for the employer to generate the Merkle root first.');
-      setStatusSuccess(false);
+      setStatus({
+        message: 'Wait for the employer to generate the Merkle root first.',
+        type: 'error',
+      });
       return;
     }
     setGenerating(true);
-    setStatus('Generating proof in browser...');
-    setStatusSuccess(false);
+    setStatus({ message: 'Generating zero-knowledge proof in browser...', type: 'info' });
     try {
       const nameHash = await hashName(name);
-      const idx = employees.findIndex((e) => e.name === name && e.amount === amount);
+      const idx = employees.findIndex(
+        (e) => e.name === name && e.amount === amount
+      );
       if (idx === -1 || !paths[idx]) {
-        setStatus('Employee not found in payroll.');
+        setStatus({
+          message: 'Employee not found in the current payroll roster.',
+          type: 'error',
+        });
         setGenerating(false);
         return;
       }
 
       const path = paths[idx];
-
-      // Convert values to match snarkjs expectations (strings in field element format)
       const pInput = {
         name_hash: '0x' + bytesToHex(nameHash),
         amount: amount.toString(),
@@ -130,11 +68,8 @@ export default function EmployeeClaim({ merkleRoot, paths, employees }: Employee
         nullifier: '0x' + bytesToHex(nameHash),
       };
 
-      console.log('Prover input:', pInput);
-
-      // Load snarkjs from CDN if not present
-      const snarkjsModule = (window as any).snarkjs || (await import('snarkjs'));
-
+      const snarkjsModule =
+        (window as any).snarkjs || (await import('snarkjs'));
       const { proof, publicSignals } = await snarkjsModule.groth16.fullProve(
         pInput,
         '/paycheck.wasm',
@@ -142,13 +77,17 @@ export default function EmployeeClaim({ merkleRoot, paths, employees }: Employee
       );
 
       setProofJson(JSON.stringify(proof, null, 2));
-      setStatus('Proof generated successfully in browser!');
-      setStatusSuccess(true);
-      console.log('Public signals:', publicSignals);
+      setStatus({
+        message: `Proof generated successfully. Public signals: ${publicSignals.length} field elements.`,
+        type: 'success',
+      });
     } catch (err: any) {
       console.error(err);
-      setStatus('Browser proving failed. Use Node.js fallback: npm run demo:proof');
-      setStatusSuccess(false);
+      setStatus({
+        message:
+          'Browser proving failed. Use Node.js fallback: npm run demo:proof',
+        type: 'error',
+      });
     } finally {
       setGenerating(false);
     }
@@ -156,67 +95,143 @@ export default function EmployeeClaim({ merkleRoot, paths, employees }: Employee
 
   const submitClaim = async () => {
     if (!proofJson) {
-      setStatus('Generate or paste a proof first.');
-      setStatusSuccess(false);
+      setStatus({
+        message: 'Generate or paste a proof first.',
+        type: 'error',
+      });
       return;
     }
-    setStatus('Submitting claim to contract... (integrate Freighter here)');
-    setStatusSuccess(false);
+    setStatus({
+      message: 'Submitting claim to Stellar contract...',
+      type: 'info',
+    });
     // TODO: Integrate Freighter + soroban-client call
-    // const proof = JSON.parse(proofJson);
-    // const result = await payrollClient.claim({ amount, nullifier, proof });
+  };
+
+  const statusIcon = (type: StatusType) => {
+    switch (type) {
+      case 'success':
+        return <CheckCircle size={18} weight="fill" color="#34d399" />;
+      case 'error':
+        return <WarningCircle size={18} weight="fill" color="#f87171" />;
+      default:
+        return <Info size={18} weight="fill" color="#94a3b8" />;
+    }
+  };
+
+  const statusClass = (type: StatusType) => {
+    switch (type) {
+      case 'success':
+        return 'status-success';
+      case 'error':
+        return 'status-error';
+      default:
+        return 'status-info';
+    }
   };
 
   return (
-    <div style={panelStyle}>
-      <h2 style={titleStyle}>Employee Claim</h2>
-      <div>
-        <label style={labelStyle}>Employee Name</label>
+    <motion.div
+      className="glass-card"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.35 }}
+      style={{ padding: 32 }}
+    >
+      <div className="section-title">
+        <Lock weight="fill" size={22} color="#34d399" />
+        Employee Claim
+      </div>
+
+      <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 24, lineHeight: 1.6 }}>
+        Generate a zero-knowledge proof locally to claim your salary. Your name
+        and exact amount remain private. Only the proof and nullifier reach the
+        chain.
+      </p>
+
+      <div style={{ marginBottom: 18 }}>
+        <label className="glass-label">Employee Name</label>
         <input
-          style={inputStyle}
+          className="glass-input"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="e.g. Carol"
         />
       </div>
-      <div>
-        <label style={labelStyle}>Claim Amount (XLM)</label>
+
+      <div style={{ marginBottom: 24 }}>
+        <label className="glass-label">Claim Amount (XLM)</label>
         <input
-          style={inputStyle}
+          className="glass-input"
           type="number"
           value={amount}
           onChange={(e) => setAmount(Number(e.target.value))}
           placeholder="e.g. 2000"
         />
       </div>
-      <button
-        style={buttonStyle}
-        onClick={generateProofInBrowser}
-        disabled={generating}
-      >
-        {generating ? 'Generating...' : 'Generate Proof (Browser)'}
-      </button>
-      <button
-        style={secondaryButtonStyle}
-        onClick={submitClaim}
-      >
-        Submit Claim
-      </button>
-      <div style={{ marginTop: '18px' }}>
-        <label style={labelStyle}>Or paste proof JSON</label>
+
+      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
+        <button
+          className="btn-glow"
+          onClick={generateProofInBrowser}
+          disabled={generating}
+        >
+          <Lightning weight="bold" size={18} />
+          {generating ? 'Generating Proof...' : 'Generate Proof'}
+        </button>
+        <button className="btn-secondary" onClick={submitClaim}>
+          <PaperPlaneRight weight="bold" size={18} />
+          Submit Claim
+        </button>
+      </div>
+
+      <div style={{ marginBottom: 20 }}>
+        <label className="glass-label">Or Paste Proof JSON</label>
         <textarea
-          style={textareaStyle}
-          rows={6}
+          className="glass-textarea"
+          rows={5}
           value={proofJson}
           onChange={(e) => setProofJson(e.target.value)}
           placeholder='{"pi_a": [...], "pi_b": [...], "pi_c": [...]}'
         />
       </div>
-      {status && (
-        <div style={statusBoxStyle(statusSuccess)}>
-          {status}
-        </div>
-      )}
-    </div>
+
+      <AnimatePresence mode="wait">
+        {status && (
+          <motion.div
+            key={status.message}
+            className={statusClass(status.type)}
+            initial={{ opacity: 0, y: 10, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.98 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 22 }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 10,
+              }}
+            >
+              <div style={{ marginTop: 2 }}>{statusIcon(status.type)}</div>
+              <span
+                style={{
+                  fontSize: 13,
+                  lineHeight: 1.5,
+                  color:
+                    status.type === 'success'
+                      ? '#34d399'
+                      : status.type === 'error'
+                      ? '#f87171'
+                      : '#94a3b8',
+                }}
+              >
+                {status.message}
+              </span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }

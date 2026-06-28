@@ -1,4 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import {
+  Users,
+  TreeStructure,
+  Copy,
+  CheckCircle,
+  Sparkle,
+} from '@phosphor-icons/react';
 import { buildMerkleTree, computeLeaf, bytesToHex } from '../utils/merkle';
 
 interface Employee {
@@ -10,72 +18,6 @@ interface EmployerPanelProps {
   onRootGenerated?: (root: string, paths: any[]) => void;
 }
 
-const panelStyle: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.06)',
-  backdropFilter: 'blur(12px)',
-  WebkitBackdropFilter: 'blur(12px)',
-  border: '1px solid rgba(255,255,255,0.10)',
-  borderRadius: '16px',
-  padding: '28px',
-  color: '#f8fafc',
-};
-
-const titleStyle: React.CSSProperties = {
-  fontSize: '20px',
-  fontWeight: 600,
-  marginBottom: '20px',
-  color: '#f8fafc',
-};
-
-const tableStyle: React.CSSProperties = {
-  width: '100%',
-  borderCollapse: 'collapse',
-  marginBottom: '20px',
-};
-
-const thStyle: React.CSSProperties = {
-  textAlign: 'left',
-  padding: '10px 12px',
-  color: '#94a3b8',
-  fontSize: '12px',
-  fontWeight: 500,
-  textTransform: 'uppercase',
-  letterSpacing: '0.05em',
-  borderBottom: '1px solid rgba(255,255,255,0.10)',
-};
-
-const tdStyle: React.CSSProperties = {
-  padding: '12px',
-  borderBottom: '1px solid rgba(255,255,255,0.06)',
-  fontSize: '14px',
-};
-
-const monoStyle: React.CSSProperties = {
-  fontFamily: "'Geist Mono', 'Fira Code', monospace",
-  fontSize: '13px',
-  letterSpacing: '-0.01em',
-};
-
-const buttonStyle: React.CSSProperties = {
-  background: '#34d399',
-  color: '#064e3b',
-  border: 'none',
-  borderRadius: '10px',
-  padding: '12px 24px',
-  fontSize: '14px',
-  fontWeight: 600,
-  cursor: 'pointer',
-  transition: 'all 0.2s ease',
-};
-
-const rootBoxStyle: React.CSSProperties = {
-  marginTop: '20px',
-  padding: '16px',
-  background: 'rgba(52, 211, 153, 0.08)',
-  border: '1px solid rgba(52, 211, 153, 0.20)',
-  borderRadius: '12px',
-};
-
 export default function EmployerPanel({ onRootGenerated }: EmployerPanelProps) {
   const [employees] = useState<Employee[]>([
     { name: 'Alice', amount: 1000 },
@@ -84,6 +26,7 @@ export default function EmployerPanel({ onRootGenerated }: EmployerPanelProps) {
   ]);
   const [root, setRoot] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const generateRoot = async () => {
     setLoading(true);
@@ -97,8 +40,6 @@ export default function EmployerPanel({ onRootGenerated }: EmployerPanelProps) {
       if (onRootGenerated) {
         onRootGenerated(rootHex, tree.paths);
       }
-      console.log('Merkle root:', rootHex);
-      console.log('Merkle paths:', tree.paths);
     } catch (err) {
       console.error(err);
     } finally {
@@ -106,51 +47,173 @@ export default function EmployerPanel({ onRootGenerated }: EmployerPanelProps) {
     }
   };
 
+  const copyRoot = () => {
+    if (!root) return;
+    navigator.clipboard.writeText(root);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
   return (
-    <div style={panelStyle}>
-      <h2 style={titleStyle}>Employer Panel</h2>
-      <table style={tableStyle}>
+    <motion.div
+      className="glass-card"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.2 }}
+      style={{ padding: 32 }}
+    >
+      <div className="section-title">
+        <Users weight="fill" size={22} color="#34d399" />
+        Employer Panel
+      </div>
+
+      <p style={{ fontSize: 14, color: '#94a3b8', marginBottom: 24, lineHeight: 1.6 }}>
+        Define the payroll roster. The Merkle root is computed locally and committed
+        on-chain. Individual salaries are never exposed.
+      </p>
+
+      <table className="glass-table">
         <thead>
           <tr>
-            <th style={thStyle}>Employee</th>
-            <th style={thStyle}>Amount (XLM)</th>
+            <th>Employee</th>
+            <th style={{ textAlign: 'right' }}>Amount (XLM)</th>
           </tr>
         </thead>
         <tbody>
           {employees.map((e, i) => (
             <tr key={i}>
-              <td style={tdStyle}>{e.name}</td>
-              <td style={{ ...tdStyle, ...monoStyle }}>{e.amount.toLocaleString()}</td>
+              <td>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: 8,
+                      background: 'rgba(52,211,153,0.1)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: '#34d399',
+                    }}
+                  >
+                    {e.name[0]}
+                  </div>
+                  {e.name}
+                </div>
+              </td>
+              <td style={{ textAlign: 'right' }} className="mono">
+                {e.amount.toLocaleString()}
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      <div className="divider-gradient" />
+
       <button
-        style={buttonStyle}
+        className="btn-glow"
         onClick={generateRoot}
         disabled={loading}
-        onMouseEnter={(e) => {
-          (e.target as HTMLButtonElement).style.opacity = '0.9';
-        }}
-        onMouseLeave={(e) => {
-          (e.target as HTMLButtonElement).style.opacity = '1';
-        }}
       >
-        {loading ? 'Computing...' : 'Generate Merkle Root'}
+        <TreeStructure weight="bold" size={18} />
+        {loading ? 'Computing Merkle Tree...' : 'Generate Merkle Root'}
       </button>
+
       {root && (
-        <div style={rootBoxStyle}>
-          <p style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Merkle Root
-          </p>
-          <p style={{ ...monoStyle, color: '#34d399', wordBreak: 'break-all' }}>
+        <motion.div
+          className="root-display"
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 12,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Sparkle weight="fill" size={16} color="#34d399" />
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: '#34d399',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.07em',
+                }}
+              >
+                Merkle Root
+              </span>
+            </div>
+            <button
+              onClick={copyRoot}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 12px',
+                background: 'rgba(52,211,153,0.1)',
+                border: '1px solid rgba(52,211,153,0.2)',
+                borderRadius: 8,
+                color: '#34d399',
+                fontSize: 12,
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(52,211,153,0.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(52,211,153,0.1)';
+              }}
+            >
+              {copied ? (
+                <>
+                  <CheckCircle size={14} weight="bold" />
+                  Copied
+                </>
+              ) : (
+                <>
+                  <Copy size={14} weight="bold" />
+                  Copy
+                </>
+              )}
+            </button>
+          </div>
+          <p
+            className="mono"
+            style={{
+              color: '#34d399',
+              fontSize: 13,
+              wordBreak: 'break-all',
+              lineHeight: 1.5,
+            }}
+          >
             {root}
           </p>
-          <p style={{ fontSize: '12px', color: '#64748b', marginTop: '8px' }}>
-            Save this root to deploy on-chain via set_payroll_root.
+          <p
+            style={{
+              fontSize: 12,
+              color: '#64748b',
+              marginTop: 12,
+              lineHeight: 1.5,
+            }}
+          >
+            This root is committed on-chain via{' '}
+            <span className="mono" style={{ color: '#94a3b8' }}>
+              set_payroll_root
+            </span>
+            . No individual salaries are revealed.
           </p>
-        </div>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 }

@@ -10,5 +10,8 @@
     "demo:proof": "node scripts/generate-proof.js",
     "dev": "cd frontend && npm run dev",
     "build": "cd frontend && npm run build"
+  },
+  "dependencies": {
+    "circomlib": "^2.0.5"
   }
 }

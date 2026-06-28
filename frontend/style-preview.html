@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZK Paycheck Shield — 前端风格选择</title>
+  <style>
+    :root {
+      --bg-page: #f4f4f5;
+      --text-primary: #18181b;
+      --text-secondary: #52525b;
+      --border: #e4e4e7;
+      --radius: 16px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg-page);
+      color: var(--text-primary);
+      min-height: 100dvh;
+      line-height: 1.5;
+      padding: 48px 24px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    @media (min-width: 768px) {
+      .grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .style-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .style-preview {
+      padding: 32px 24px;
+      flex: 1;
+    }
+
+    .style-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .style-desc {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .swatch-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .swatch {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .mock-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .mock-panel {
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .mock-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .mock-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .mock-text {
+      height: 10px;
+      border-radius: 999px;
+    }
+
+    .mock-btn {
+      height: 32px;
+      border-radius: 8px;
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .meta {
+      padding: 16px 24px;
+      background: #fafafa;
+      border-top: 1px solid var(--border);
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+    }
+
+    .meta strong {
+      color: var(--text-primary);
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* --- Style A: Dark Tech Terminal --- */
+    .style-a .style-preview {
+      background: #0a0a0a;
+      color: #e5e5e5;
+    }
+    .style-a .style-name {
+      color: #ffffff;
+    }
+    .style-a .style-desc {
+      color: #a1a1aa;
+    }
+    .style-a .mock-panel {
+      background: #111111;
+      border: 1px solid #27272a;
+    }
+    .style-a .mock-text {
+      background: #27272a;
+    }
+    .style-a .mock-btn {
+      background: #00d4ff;
+    }
+    .style-a .mock-label {
+      color: #71717a;
+    }
+    .style-a .meta {
+      background: #111111;
+      border-top-color: #27272a;
+      color: #a1a1aa;
+    }
+    .style-a .meta strong {
+      color: #e4e4e7;
+    }
+
+    /* --- Style B: Linear Minimal --- */
+    .style-b .style-preview {
+      background: #fafafa;
+      color: #18181b;
+    }
+    .style-b .style-name {
+      color: #18181b;
+    }
+    .style-b .style-desc {
+      color: #52525b;
+    }
+    .style-b .mock-panel {
+      background: #ffffff;
+      border: 1px solid #e4e4e7;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .style-b .mock-text {
+      background: #e4e4e7;
+    }
+    .style-b .mock-btn {
+      background: #18181b;
+    }
+    .style-b .mock-label {
+      color: #71717a;
+    }
+    .style-b .meta {
+      background: #ffffff;
+      border-top-color: #e4e4e7;
+      color: #52525b;
+    }
+    .style-b .meta strong {
+      color: #18181b;
+    }
+
+    /* --- Style C: Frosted Vault --- */
+    .style-c .style-preview {
+      background: #0f172a;
+      color: #f8fafc;
+    }
+    .style-c .style-name {
+      color: #ffffff;
+    }
+    .style-c .style-desc {
+      color: #94a3b8;
+    }
+    .style-c .mock-panel {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.10);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .style-c .mock-text {
+      background: rgba(255,255,255,0.12);
+    }
+    .style-c .mock-btn {
+      background: #34d399;
+    }
+    .style-c .mock-label {
+      color: #64748b;
+    }
+    .style-c .meta {
+      background: #0b1221;
+      border-top-color: rgba(255,255,255,0.08);
+      color: #94a3b8;
+    }
+    .style-c .meta strong {
+      color: #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>ZK Paycheck Shield</h1>
+      <p>选择前端视觉风格 — 三种方向，一种落地</p>
+    </header>
+
+    <div class="grid">
+      <!-- Style A -->
+      <div class="style-card style-a">
+        <div class="style-preview">
+          <div class="style-name">A. Dark Tech Terminal</div>
+          <div class="style-desc">
+            暗色终端科技风。以近黑底色与电光蓝 accent 营造密码学与零知识证明的精密感。适合强调技术深度与 ZK 硬核氛围。
+          </div>
+          <div class="swatch-row">
+            <div class="swatch" style="background:#0a0a0a"></div>
+            <div class="swatch" style="background:#111111"></div>
+            <div class="swatch" style="background:#00d4ff"></div>
+            <div class="swatch" style="background:#e5e5e5"></div>
+          </div>
+          <div class="mock-label">Employer Panel Preview</div>
+          <div class="mock-panel">
+            <div class="mock-row">
+              <div class="mock-text" style="width:60%"></div>
+              <div class="mock-text" style="width:20%; background:#00d4ff"></div>
+            </div>
+            <div class="mock-row">
+              <div class="mock-text" style="width:40%"></div>
+              <div class="mock-text" style="width:30%"></div>
+            </div>
+            <div class="mock-btn"></div>
+          </div>
+        </div>
+        <div class="meta">
+          <strong>Design Read</strong>
+          Variance: 6 / Motion: 4 / Density: 5<br>
+          Best for: 技术评委，强调 ZK 硬核与精确感
+        </div>
+      </div>
+
+      <!-- Style B -->
+      <div class="style-card style-b">
+        <div class="style-preview">
+          <div class="style-name">B. Linear Minimal</div>
+          <div class="style-desc">
+            极简 SaaS 风。极高的留白与清晰的信息层级，让功能自己说话。类似 Linear / Vercel 的克制美学，降低认知负荷。
+          </div>
+          <div class="swatch-row">
+            <div class="swatch" style="background:#fafafa"></div>
+            <div class="swatch" style="background:#ffffff"></div>
+            <div class="swatch" style="background:#18181b"></div>
+            <div class="swatch" style="background:#e4e4e7"></div>
+          </div>
+          <div class="mock-label">Employer Panel Preview</div>
+          <div class="mock-panel">
+            <div class="mock-row">
+              <div class="mock-text" style="width:55%"></div>
+              <div class="mock-text" style="width:25%; background:#18181b"></div>
+            </div>
+            <div class="mock-row">
+              <div class="mock-text" style="width:35%"></div>
+              <div class="mock-text" style="width:35%"></div>
+            </div>
+            <div class="mock-btn"></div>
+          </div>
+        </div>
+        <div class="meta">
+          <strong>Design Read</strong>
+          Variance: 5 / Motion: 3 / Density: 3<br>
+          Best for: 功能优先，让评委快速理解交互逻辑
+        </div>
+      </div>
+
+      <!-- Style C -->
+      <div class="style-card style-c">
+        <div class="style-preview">
+          <div class="style-name">C. Frosted Vault</div>
+          <div class="style-desc">
+            磨砂玻璃金库风。深色背景叠加 backdrop-filter 玻璃面板，配合 Emerald accent，传递"隐私金库"的未来感与安全感。
+          </div>
+          <div class="swatch-row">
+            <div class="swatch" style="background:#0f172a"></div>
+            <div class="swatch" style="background:rgba(255,255,255,0.06)"></div>
+            <div class="swatch" style="background:#34d399"></div>
+            <div class="swatch" style="background:#f8fafc"></div>
+          </div>
+          <div class="mock-label">Employer Panel Preview</div>
+          <div class="mock-panel">
+            <div class="mock-row">
+              <div class="mock-text" style="width:58%"></div>
+              <div class="mock-text" style="width:22%; background:#34d399"></div>
+            </div>
+            <div class="mock-row">
+              <div class="mock-text" style="width:38%"></div>
+              <div class="mock-text" style="width:32%"></div>
+            </div>
+            <div class="mock-btn"></div>
+          </div>
+        </div>
+        <div class="meta">
+          <strong>Design Read</strong>
+          Variance: 7 / Motion: 5 / Density: 4<br>
+          Best for: 强调隐私保护与前沿技术，视觉记忆点强
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -10,7 +10,7 @@ const {
 const fs = require('fs');
 
 const SECRET_KEY = 'SBECHZFQ3LPFBGQDKUBIJSCYXDQOFKICXCF7SCZDLJNEWK5TRCQELIDP';
-const PAYROLL_ID = 'CBC3PSZJP5XH72P4AXI3FNSPYTDBZ3DQBSS7OV5FMTL2EMSDDVXKKAFN';
+const PAYROLL_ID = 'CDFGZNOBM2Y3P3LHY6MGURLXUEPVIPTX5EY5NGH3OLK6QQUZFJINWKLL';
 const RPC_URL = 'https://soroban-testnet.stellar.org';
 
 async function main() {
@@ -43,7 +43,7 @@ async function main() {
     fieldToBytes(proof.pi_c[1]),
   ]);
 
-  const nullifier = fieldToBytes('3197117038393837379772969007178677911013286088693601531943012912823149950474');
+  const nullifier = fieldToBytes('10941033643596869018319331680733498030047688207189912058218674328483190264336');
 
   console.log('pi_a length:', pi_a.length);
   console.log('pi_b length:', pi_b.length);
@@ -65,7 +65,7 @@ async function main() {
     .addOperation(
       contract.call(
         'claim',
-        nativeToScVal(2000, { type: 'i128' }),
+        nativeToScVal(1000, { type: 'i128' }),
         nativeToScVal(nullifier, { type: 'bytes' }),
         nativeToScVal(pi_a, { type: 'bytes' }),
         nativeToScVal(pi_b, { type: 'bytes' }),

@@ -1,8 +1,21 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { ShieldCheck, Radio, Globe, FileCode, Circuitry } from '@phosphor-icons/react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  ShieldCheck,
+  Radio,
+  Globe,
+  FileCode,
+  Circuitry,
+  Users,
+  Lock,
+  Eye,
+  Info,
+} from '@phosphor-icons/react';
 import EmployerPanel from './components/EmployerPanel';
 import EmployeeClaim from './components/EmployeeClaim';
+import ComplianceDashboard from './components/ComplianceDashboard';
+import MerkleTreeViz from './components/MerkleTreeViz';
+import BeforeAfter from './components/BeforeAfter';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -21,9 +34,39 @@ const itemVariants = {
   },
 };
 
+const employees = [
+  { name: 'Alice', amount: 1000 },
+  { name: 'Bob', amount: 1500 },
+  { name: 'Carol', amount: 2000 },
+];
+
+type TabKey = 'employer' | 'employee' | 'compliance' | 'about';
+
 function App() {
+  const [activeTab, setActiveTab] = useState<TabKey>('employer');
   const [root, setRoot] = useState<string | null>(null);
   const [paths, setPaths] = useState<any[]>([]);
+  const [claimedRecords, setClaimedRecords] = useState<
+    { nullifier: string; amount: number; timestamp: string }[]
+  >([]);
+
+  const handleClaimSuccess = (nullifier: string, amount: number) => {
+    setClaimedRecords((prev) => [
+      ...prev,
+      { nullifier, amount, timestamp: new Date().toISOString() },
+    ]);
+  };
+
+  const tabs: { key: TabKey; label: string; icon: React.ReactNode }[] = [
+    { key: 'employer', label: 'Employer', icon: <Users size={16} /> },
+    { key: 'employee', label: 'Employee', icon: <Lock size={16} /> },
+    {
+      key: 'compliance',
+      label: 'Compliance',
+      icon: <Eye size={16} />,
+    },
+    { key: 'about', label: 'About ZK', icon: <Info size={16} /> },
+  ];
 
   return (
     <>
@@ -123,41 +166,156 @@ function App() {
             <ContractPill
               icon={<FileCode size={14} color="#34d399" />}
               label="Payroll"
-              address="CBC3PSZJP5XH72P4AXI3FNSPYTDBZ3DQBSS7OV5FMTL2EMSDDVXKKAFN"
+              address="CDFGZNOBM2Y3P3LHY6MGURLXUEPVIPTX5EY5NGH3OLK6QQUZFJINWKLL"
             />
             <ContractPill
               icon={<ShieldCheck size={14} color="#34d399" />}
               label="Verifier"
-              address="CCXIGG3XWVN44OZAXOIG4AWGDFQX46TPYFNNLTMN7ONBRH2VXS6Y52UA"
+              address="CBZ4FENUWDDKNRLNWK2UBUSV7AHKTBCADYMXQPGYUDVMTVXYINJNRLVF"
             />
           </motion.div>
 
-          {/* Main Grid */}
+          {/* Tab Navigation */}
           <motion.div
             variants={itemVariants}
-            className="app-grid"
             style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: 24,
+              display: 'flex',
+              justifyContent: 'center',
+              gap: 8,
+              marginBottom: 32,
+              flexWrap: 'wrap',
             }}
           >
-            <EmployerPanel
-              onRootGenerated={(r, p) => {
-                setRoot(r);
-                setPaths(p);
+            <div
+              style={{
+                display: 'flex',
+                background: 'rgba(0,0,0,0.3)',
+                borderRadius: 14,
+                padding: 5,
+                border: '1px solid rgba(255,255,255,0.06)',
               }}
-            />
-            <EmployeeClaim
-              merkleRoot={root}
-              paths={paths}
-              employees={[
-                { name: 'Alice', amount: 1000 },
-                { name: 'Bob', amount: 1500 },
-                { name: 'Carol', amount: 2000 },
-              ]}
-            />
+            >
+              {tabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    padding: '10px 20px',
+                    borderRadius: 10,
+                    border: 'none',
+                    background:
+                      activeTab === tab.key
+                        ? 'rgba(255,255,255,0.08)'
+                        : 'transparent',
+                    color:
+                      activeTab === tab.key ? '#f8fafc' : '#64748b',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.25s ease',
+                  }}
+                >
+                  {tab.icon}
+                  {tab.label}
+                </button>
+              ))}
+            </div>
           </motion.div>
+
+          {/* Tab Content */}
+          <AnimatePresence mode="wait">
+            {activeTab === 'employer' && (
+              <motion.div
+                key="employer"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.25 }}
+              >
+                <div
+                  className="app-grid"
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: 24,
+                  }}
+                >
+                  <EmployerPanel
+                    onRootGenerated={(r, p) => {
+                      setRoot(r);
+                      setPaths(p);
+                    }}
+                  />
+                  <MerkleTreeViz
+                    leaves={employees.map((e) => ({
+                      name: e.name,
+                      hash: '0'.repeat(64),
+                    }))}
+                    selectedIndex={
+                      employees.findIndex((e) => e.name === 'Carol')
+                    }
+                  />
+                </div>
+              </motion.div>
+            )}
+
+            {activeTab === 'employee' && (
+              <motion.div
+                key="employee"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.25 }}
+              >
+                <div
+                  className="app-grid"
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: 24,
+                  }}
+                >
+                  <EmployeeClaim
+                    merkleRoot={root}
+                    paths={paths}
+                    employees={employees}
+                    onClaimSuccess={handleClaimSuccess}
+                  />
+                  <BeforeAfter />
+                </div>
+              </motion.div>
+            )}
+
+            {activeTab === 'compliance' && (
+              <motion.div
+                key="compliance"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.25 }}
+              >
+                <ComplianceDashboard
+                  employees={employees}
+                  claimedRecords={claimedRecords}
+                />
+              </motion.div>
+            )}
+
+            {activeTab === 'about' && (
+              <motion.div
+                key="about"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.25 }}
+              >
+                <BeforeAfter />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </motion.div>
     </>
@@ -210,7 +368,10 @@ function ContractPill({
     >
       {icon}
       <span style={{ fontWeight: 600 }}>{label}</span>
-      <span className="mono" style={{ color: copied ? '#34d399' : '#64748b' }}>
+      <span
+        className="mono"
+        style={{ color: copied ? '#34d399' : '#64748b' }}
+      >
         {copied ? 'Copied!' : `${address.slice(0, 6)}...${address.slice(-4)}`}
       </span>
     </button>

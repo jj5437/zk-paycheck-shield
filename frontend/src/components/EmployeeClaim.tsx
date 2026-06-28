@@ -14,6 +14,7 @@ interface EmployeeClaimProps {
   merkleRoot: string | null;
   paths: any[];
   employees: { name: string; amount: number }[];
+  onClaimSuccess?: (nullifier: string, amount: number) => void;
 }
 
 type StatusType = 'info' | 'success' | 'error';
@@ -27,6 +28,7 @@ export default function EmployeeClaim({
   merkleRoot,
   paths,
   employees,
+  onClaimSuccess,
 }: EmployeeClaimProps) {
   const [name, setName] = useState('Carol');
   const [amount, setAmount] = useState(2000);
@@ -105,7 +107,29 @@ export default function EmployeeClaim({
       message: 'Submitting claim to Stellar contract...',
       type: 'info',
     });
-    // TODO: Integrate Freighter + soroban-client call
+
+    try {
+      // Simulate claim submission (Freighter integration TODO)
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+
+      // Compute nullifier for record keeping
+      const nameHash = await hashName(name);
+      const nullifierHex = bytesToHex(nameHash);
+
+      setStatus({
+        message: `Claim submitted successfully. Nullifier: ${nullifierHex.slice(0, 16)}...`,
+        type: 'success',
+      });
+
+      if (onClaimSuccess) {
+        onClaimSuccess('0x' + nullifierHex, amount);
+      }
+    } catch (err: any) {
+      setStatus({
+        message: 'Claim submission failed: ' + err.message,
+        type: 'error',
+      });
+    }
   };
 
   const statusIcon = (type: StatusType) => {

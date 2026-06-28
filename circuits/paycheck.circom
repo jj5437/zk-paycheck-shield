@@ -45,10 +45,19 @@ template PaycheckProof(levels) {
 
     root === currentHash[levels];
 
-    // 3. amount != 0 check using IsZero
+    // 3. Range proof: 0 < amount <= MAX_SALARY (10,000 XLM)
+    var MAX_SALARY = 10000;
+
+    // amount != 0
     component isZero = IsZero();
     isZero.in <== amount;
     isZero.out === 0;
+
+    // amount <= MAX_SALARY (i.e. amount < MAX_SALARY + 1)
+    component rangeCheck = LessThan(64);
+    rangeCheck.in[0] <== amount;
+    rangeCheck.in[1] <== MAX_SALARY + 1;
+    rangeCheck.out === 1;
 
     // 4. nullifier = Poseidon(name_hash)
     component nfHasher = Poseidon(1);

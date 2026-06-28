@@ -58,17 +58,17 @@ https://github.com/jj5437/zk-paycheck-shield
 
 ## Demo Video
 
-[TBD - 2-3 minute screen recording]
+*Uploading to Cloudflare R2 — link will be inserted here.*
 
 ## Contract Addresses (Testnet)
 
-- Verifier: `CCXIGG3XWVN44OZAXOIG4AWGDFQX46TPYFNNLTMN7ONBRH2VXS6Y52UA`
-- Payroll: `CBC3PSZJP5XH72P4AXI3FNSPYTDBZ3DQBSS7OV5FMTL2EMSDDVXKKAFN`
+- Verifier: `CBZ4FENUWDDKNRLNWK2UBUSV7AHKTBCADYMXQPGYUDVMTVXYINJNRLVF`
+- Payroll: `CDFGZNOBM2Y3P3LHY6MGURLXUEPVIPTX5EY5NGH3OLK6QQUZFJINWKLL`
 
 ## Successful Claim Transaction
 
-- **Tx Hash:** `56ca0513c213ca17a4082940acf7853d9bde89330542383aef523e8124f1d2a4`
-- **Explorer:** https://stellar.expert/explorer/testnet/tx/56ca0513c213ca17a4082940acf7853d9bde89330542383aef523e8124f1d2a4
+- **Tx Hash:** `9e8947038bc7d52bb49bb7da9a60632ac9ef6ea798c6ea576dda16f93a31b888`
+- **Explorer:** https://stellar.expert/explorer/testnet/tx/9e8947038bc7d52bb49bb7da9a60632ac9ef6ea798c6ea576dda16f93a31b888
 
 ## License
 

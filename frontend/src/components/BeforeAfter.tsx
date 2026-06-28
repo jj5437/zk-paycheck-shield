@@ -194,7 +194,7 @@ export default function BeforeAfter() {
           >
             <ExplorerCard
               title="Stellar Expert — ZK Shield"
-              subtitle="Transaction 0x9c2a...b41f"
+              subtitle="Transaction 9e8947...1b888"
               icon=<ShieldCheck size={16} color="#34d399" />
               accent="#34d399"
             >
@@ -205,7 +205,7 @@ export default function BeforeAfter() {
                 />
                 <ExplorerField
                   label="Contract"
-                  value="CBC3...KAFN (Payroll)"
+                  value="CDFG...WKLL (Payroll)"
                 />
                 <ExplorerField
                   label="Caller"

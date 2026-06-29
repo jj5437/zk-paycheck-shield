@@ -11,6 +11,7 @@ verification_key.json
 .env
 *.log
 .DS_Store
+BUIDL_SUBMISSION.md
 contracts/*/verifier_contract_id.txt
 contracts/*/payroll_contract_id.txt
 *.mp4

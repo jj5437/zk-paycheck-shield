@@ -12,6 +12,9 @@ verification_key.json
 *.log
 .DS_Store
 BUIDL_SUBMISSION.md
+DEMO_SCRIPT.md
+NEXT_STEPS.md
+PROGRESS.md
 contracts/*/verifier_contract_id.txt
 contracts/*/payroll_contract_id.txt
 *.mp4

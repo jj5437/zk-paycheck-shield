@@ -85,6 +85,8 @@ Employers commit only a **Merkle root** to Stellar. Employees submit a **zero-kn
 
 ## Demo
 
+🚀 **[Open the Live Demo](https://zk-paycheck-shield.vercel.app)** — interactive employer, employee, compliance, and privacy comparison flows.
+
 🎥 **[Watch the Demo Video](https://assets.jijingai.cc/zk-paycheck-shield-demo-v2-subtitled.mp4)** — 2:10 English narrated demo with burned-in captions.
 
 ---

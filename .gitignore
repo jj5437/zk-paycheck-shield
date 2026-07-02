@@ -20,3 +20,4 @@ contracts/*/payroll_contract_id.txt
 *.mp4
 *.webm
 .wrangler/
+.vercel/
